@@ -1,2 +1,3 @@
 # aisTest
-Test Celin.AIS
+
+Download the above source to test Celin.AIS
