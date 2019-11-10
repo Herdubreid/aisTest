@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Celin.AIS;
-using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.Logging;
 
 namespace aisTest
 {
@@ -10,12 +11,20 @@ namespace aisTest
     {
         async static Task Main(string[] args)
         {
+            // Initialise the Logger
+            var loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder
+                    .SetMinimumLevel(LogLevel.Debug)
+                    .AddConsole();
+            });
+            ILogger logger = loggerFactory.CreateLogger<Program>();
             // Initalise E1 Server
-            var e1 = new Celin.AIS.Server("http(s)://server:port/jderest/v2/");
+            var e1 = new Server("http://demo.steltix.com/jderest/v2/", logger);
             // Set the authentication parameters
             e1.AuthRequest.deviceName = "aisTest";
-            e1.AuthRequest.username = "demo";
-            e1.AuthRequest.password = "demo";
+            e1.AuthRequest.username = "DEMO";
+            e1.AuthRequest.password = "DEMO";
 
             try
             {
@@ -30,19 +39,18 @@ namespace aisTest
                     version = "ZJDE0001",
                     formServiceAction = "R",
                     maxPageSize = "10",
-                    formActions = new List<Celin.AIS.Action>()
-                };
-                // Create Form Actions
-                ab.formActions = new[]
-                {
-                    // Set the Search Type to "C"
-                    new FormAction() { controlID = "54", command = "SetControlValue", value = "C" },
-                   // Press the Find Button
-                    new FormAction() { controlID = "15", command = "DoAction" }
+                    // Create Form Actions
+                    formActions = new List<Celin.AIS.Action>
+                    {
+                        // Set the Search Type to "C"
+                        new FormAction() { controlID = "54", command = FormAction.SetControlValue, value = "C" },
+                       // Press the Find Button
+                        new FormAction() { controlID = "15", command = FormAction.DoAction }
+                    }
                 };
 
                 // Submit the Form Request with a Generic Response Object
-                var genRsp =  await e1.RequestAsync<JObject>(ab);
+                var genRsp =  await e1.RequestAsync<object>(ab);
                 // Request successful, dumpt the output to the Console
                 Console.WriteLine(genRsp);
 
@@ -50,11 +58,11 @@ namespace aisTest
                 ab.returnControlIDs = "1[19,20]";
 
                 // Submit the form Request with our AB class definition
-                var abRsp = await e1.RequestAsync<AddressBookForm>(ab);
+                AddressBookForm abRsp = await e1.RequestAsync<AddressBookForm>(ab);
                 // Print the Grid Items to the Console
                 foreach (var r in abRsp.fs_P01012_W01012B.data.gridData.rowset)
                 {
-                    Console.WriteLine("{0, 12} {1}", r.mnAddressNumber_19.value, r.sAlphaName_20.value);
+                    Console.WriteLine("{0, 12} {1}", r.z_AN8_19, r.z_ALPH_20);
                 }
             }
             catch (Exception e)

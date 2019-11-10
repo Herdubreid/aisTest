@@ -5,20 +5,9 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="$(NuGetPackageRoot)nlog.config/4.5.9/contentFiles/any/any/NLog.config" Condition="Exists('$(NuGetPackageRoot)nlog.config/4.5.9/contentFiles/any/any/NLog.config')">
-      <NuGetPackageId>NLog.Config</NuGetPackageId>
-      <NuGetPackageVersion>4.5.9</NuGetPackageVersion>
-      <NuGetItemType>None</NuGetItemType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <TargetPath>NLog.config</TargetPath>
-      <Private>True</Private>
-      <Link>NLog.config</Link>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Celin.AIS\Celin.AIS.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.0.0" />
   </ItemGroup>
 </Project>
