@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Celin.AIS;
+﻿using Celin.AIS;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace aisTest
+namespace Celin
 {
     class Program
     {
@@ -32,15 +32,24 @@ namespace aisTest
                 await e1.AuthenticateAsync();
                 Console.WriteLine("{0} Logged on {1}!", e1.AuthResponse.userInfo.alphaName, e1.AuthResponse.environment);
 
+                // Get PO's
+                var zjde0001 = await e1.RequestAsync<PoResponse<T01012>>(new PoRequest
+                {
+                    applicationName = "P01012",
+                    version = "ZJDE0002"
+                });
+                Console.WriteLine(zjde0001);
+
                 // Create an AB Form Request
                 var ab = new FormRequest()
                 {
+                    outputType = Request.GRID_DATA,
                     formName = "P01012_W01012B",
-                    version = "ZJDE0001",
+                    version = "ZJDE0002",
                     formServiceAction = "R",
                     maxPageSize = "10",
                     // Create Form Actions
-                    formActions = new List<Celin.AIS.Action>
+                    formActions = new List<AIS.Action>
                     {
                         // Set the Search Type to "C"
                         new FormAction() { controlID = "54", command = FormAction.SetControlValue, value = "C" },
@@ -49,8 +58,10 @@ namespace aisTest
                     }
                 };
 
+                // Create a 500ms Cancel Object
+                var cancel = new CancellationTokenSource(50000);
                 // Submit the Form Request with a Generic Response Object
-                var genRsp =  await e1.RequestAsync<object>(ab);
+                var genRsp =  await e1.RequestAsync<object>(ab, cancel);
                 // Request successful, dumpt the output to the Console
                 Console.WriteLine(genRsp);
 
@@ -64,6 +75,10 @@ namespace aisTest
                 {
                     Console.WriteLine("{0, 12} {1}", r.z_AN8_19, r.z_ALPH_20);
                 }
+            }
+            catch (OperationCanceledException e)
+            {
+                Console.WriteLine("Cancelled: {0}", e.Message);
             }
             catch (Exception e)
             {

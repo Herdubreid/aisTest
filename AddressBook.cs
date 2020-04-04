@@ -1,5 +1,5 @@
 ﻿using Celin.AIS;
-namespace aisTest
+namespace Celin
 {
     public class AddressBookRow
     {
