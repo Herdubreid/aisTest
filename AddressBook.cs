@@ -1,4 +1,4 @@
-﻿using Celin.AIS;
+using Celin.AIS;
 namespace Celin
 {
     public class AddressBookRow

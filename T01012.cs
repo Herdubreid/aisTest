@@ -1,4 +1,4 @@
-﻿using Celin.AIS;
+using Celin.AIS;
 using System;
 using System.Collections.Generic;
 using System.Text;
